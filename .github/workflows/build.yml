@@ -1,0 +1,89 @@
+name: Build TechScan
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Build Windows
+        run: |
+          pyinstaller --onefile src/main.py --name TechScan-Windows
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TechScan-Windows
+          path: dist/TechScan-Windows.exe
+
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Linux packages
+        run: |
+          sudo apt update
+          sudo apt install -y smartmontools lm-sensors
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Build Linux
+        run: |
+          pyinstaller --onefile src/main.py --name TechScan-Linux
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TechScan-Linux
+          path: dist/TechScan-Linux
+
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Build macOS
+        run: |
+          pyinstaller --onefile src/main.py --name TechScan-MacOS
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TechScan-MacOS
+          path: dist/TechScan-MacOS
